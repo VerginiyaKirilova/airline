@@ -21,7 +21,7 @@ public class FlightDetails extends HttpServlet
     //    @EJB
     //    private FlightServiceStatelessBean flightService;
 
-   // @EJB(beanName = "flightStateful")
+    // @EJB(beanName = "flightStateful")
     private FlightLocal flightServiceStateful;
     //private FlightLocal flightService;
 

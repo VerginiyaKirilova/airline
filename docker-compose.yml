@@ -1,0 +1,55 @@
+# run only mySQL:
+#  docker run -p 11306:113306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=db-sd mysql:8.0.0
+
+# create image of javaee:SNAPSHOT-1.0.0 - if we use image, instead of build in services:
+#       services:
+#          app-sd:
+#          image: javaee:SNAPSHOT-1.0.0
+#  ~C:\Users\Vegito\HW\JavaEE_EnterpriseJavaBeans$ docker build -t javaee:SNAPSHOT-1.0.0 .
+#  C:\Users\Vegito\HW\JavaEE_EnterpriseJavaBeans$ docker build --no-cache -t javaee:SNAPSHOT-1.0.0 .
+
+# run all containers defined in docker-compose.yml:
+#  C:\Users\Vegito\HW\JavaEE_EnterpriseJavaBeans$ docker compose up
+
+
+services:
+
+  app-sd:
+    build: .
+    #    image: javaee:SNAPSHOT-1.0.0 - if already exists
+    #    build: javaee:SNAPSHOT-1.0.0
+    depends_on:
+      mysql-sd:
+        condition: service_started
+    ports:
+      - "28080:8080"  # http://localhost:28080/ejb/ShowCount
+      - "29990:9990"  # http://0.0.0.0:29990/management admin admin
+      - "38787:8787"  # Remote JVM
+      - "25005:5005"
+    volumes:
+      - C:\Users\Vegito\HW\JavaEE_EnterpriseJavaBeans\deployment:/opt/jboss/wildfly/standalone/deployments/
+    networks:
+      - sd
+
+  mysql-sd:
+    container_name: "mysql-sd"
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: db-sd
+      MYSQL_USER: dev
+      MYSQL_PASSWORD: dev
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql:/var/lib/mysql
+      - mysql-dumps:/dump
+    ports:
+      - "23306:3306"
+    networks:
+      - sd
+volumes:
+  mysql:
+  mysql-dumps:
+    driver: local
+
+networks:
+  sd:
